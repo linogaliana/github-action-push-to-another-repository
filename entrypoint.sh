@@ -16,6 +16,7 @@ TARGET_BRANCH="${9}"
 COMMIT_MESSAGE="${10}"
 TARGET_DIRECTORY="${11}"
 CREATE_TARGET_BRANCH_IF_NEEDED="${12}"
+RESET_REPO="${13}"
 
 if [ -z "$DESTINATION_REPOSITORY_USERNAME" ]
 then
@@ -146,6 +147,19 @@ ORIGIN_COMMIT="https://$GITHUB_SERVER/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
 COMMIT_MESSAGE="${COMMIT_MESSAGE/ORIGIN_COMMIT/$ORIGIN_COMMIT}"
 COMMIT_MESSAGE="${COMMIT_MESSAGE/\$GITHUB_REF/$GITHUB_REF}"
 
+
+if [ "$RESET_REPO" = "true" ]
+then
+	# Default branch of the repository is cloned. Later on the required branch
+	# will be created
+    rm -rf .git
+	git init
+	git remote add origin $GIT_CMD_REPOSITORY
+else
+    false
+fi
+
+
 echo "[+] Set directory is safe ($CLONE_DIR)"
 # Related to https://github.com/cpina/github-action-push-to-another-repository/issues/64
 git config --global --add safe.directory "$CLONE_DIR"
@@ -160,6 +174,8 @@ then
     git switch -c "$TARGET_BRANCH" || true
 fi
 
+
+
 echo "[+] Adding git commit"
 git add .
 
@@ -171,5 +187,14 @@ echo "[+] git diff-index:"
 git diff-index --quiet HEAD || git commit --message "$COMMIT_MESSAGE"
 
 echo "[+] Pushing git commit"
-# --set-upstream: sets de branch when pushing to a branch that does not exist
-git push "$GIT_CMD_REPOSITORY" --set-upstream "$TARGET_BRANCH"
+
+if [ "$RESET_REPO" = "true" ]
+then
+	# --set-upstream: sets de branch when pushing to a branch that does not exist
+	git push "$GIT_CMD_REPOSITORY" --set-upstream "$TARGET_BRANCH" --force
+else
+	# --set-upstream: sets de branch when pushing to a branch that does not exist
+	git push "$GIT_CMD_REPOSITORY" --set-upstream "$TARGET_BRANCH"
+fi
+
+
