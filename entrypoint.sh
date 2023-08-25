@@ -177,7 +177,7 @@ fi
 
 
 echo "[+] Adding git commit"
-git add -A
+git add .
 
 echo "[+] git status:"
 git status
