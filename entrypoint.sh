@@ -175,6 +175,8 @@ then
 fi
 
 
+echo "[+] Initial commit"
+git commit --allow-empty -n -m "Initial commit."
 
 echo "[+] Adding git commit"
 git add .
