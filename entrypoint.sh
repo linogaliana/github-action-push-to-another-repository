@@ -153,6 +153,10 @@ COMMIT_MESSAGE="${COMMIT_MESSAGE/ORIGIN_COMMIT/$ORIGIN_COMMIT}"
 COMMIT_MESSAGE="${COMMIT_MESSAGE/\$GITHUB_REF/$GITHUB_REF}"
 
 
+echo "[+] Setting default main branch"
+git config --global init.defaultBranch main
+
+
 if [ "$RESET_REPO" = "true" ]
 then
 	# Default branch of the repository is cloned. Later on the required branch
@@ -174,8 +178,6 @@ then
     # If the branch did not exist: it switches (creating) the branch
     git switch -c "$TARGET_BRANCH" || true
 fi
-
-git config --global init.defaultBranch
 
 echo "[+] Initial commit"
 git commit --allow-empty -n -m "Initial commit."
