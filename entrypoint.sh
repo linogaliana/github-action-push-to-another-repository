@@ -74,6 +74,11 @@ git config --global user.name "$USER_NAME"
 # workaround for https://github.com/cpina/github-action-push-to-another-repository/issues/103
 git config --global http.version HTTP/1.1
 
+echo "[+] Set directory is safe ($CLONE_DIR)"
+# Related to https://github.com/cpina/github-action-push-to-another-repository/issues/64
+git config --global --add safe.directory "$CLONE_DIR"
+
+
 {
 	git clone --single-branch --depth 1 --branch "$TARGET_BRANCH" "$GIT_CMD_REPOSITORY" "$CLONE_DIR"
 } || {
@@ -160,10 +165,6 @@ else
 fi
 
 
-echo "[+] Set directory is safe ($CLONE_DIR)"
-# Related to https://github.com/cpina/github-action-push-to-another-repository/issues/64
-git config --global --add safe.directory "$CLONE_DIR"
-
 if [ "$CREATE_TARGET_BRANCH_IF_NEEDED" = "true" ]
 then
     echo "[+] Switch to the TARGET_BRANCH"
@@ -174,6 +175,7 @@ then
     git switch -c "$TARGET_BRANCH" || true
 fi
 
+git config --global init.defaultBranch
 
 echo "[+] Initial commit"
 git commit --allow-empty -n -m "Initial commit."
